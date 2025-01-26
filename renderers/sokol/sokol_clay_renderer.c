@@ -659,7 +659,7 @@ void ui_render_clay(Clay_RenderCommandArray renderCommands){
 
                 ui_draw_text(cloned, (TextDescription){
                     .position_x = boundingBox.x,
-                    .position_y = boundingBox.y-state.height,
+                    .position_y = boundingBox.y,
                     .size = (float)renderCommand->config.textElementConfig->fontSize,
                     .spacing = (float)renderCommand->config.textElementConfig->letterSpacing,
                     .color = sfons_rgba(
@@ -837,14 +837,11 @@ void ui_render_clay(Clay_RenderCommandArray renderCommands){
 static inline Clay_Dimensions ui_measure_text(Clay_StringSlice text, Clay_TextElementConfig *config, uintptr_t userData)
 {
     float out_bounds[4];
-    char *chars = (char *)malloc(text.length + 1);
-    memcpy(chars, text.chars, text.length);
-    chars[text.length] = '\0';
+    // char *chars = (char *)malloc(text.length + 1);
+    // memcpy(chars, text.chars, text.length);
+    // chars[text.length] = '\0';
+    
     char *end = "\0";
-
-    FONScontext *fs = state.fons;
-
-    float dpi = state.dpi_scale;
 
     fonsSetSize(state.fons, config->fontSize);
     fonsSetSpacing(state.fons, config->letterSpacing);
@@ -853,7 +850,7 @@ static inline Clay_Dimensions ui_measure_text(Clay_StringSlice text, Clay_TextEl
 
     //printf("%f,%f,%f,%f -- %s --\n", out_bounds[0], out_bounds[1], out_bounds[2], out_bounds[3], text.chars);
 
-    free(chars);
+    //free(chars);
 
-    return (Clay_Dimensions) { .height = 12, .width = out_bounds[0]*text.length };
+    return (Clay_Dimensions) { .height = config->fontSize, .width = out_bounds[0]*text.length };
 }
