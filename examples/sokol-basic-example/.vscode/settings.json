@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "handmademath.h": "c",
+        "sokol_gfx.h": "c",
+        "sokol_app.h": "c",
+        "sokol_log.h": "c",
+        "sokol_glue.h": "c",
+        "sokol_gl.h": "c",
+        "stb_truetype.h": "c",
+        "fontstash.h": "c",
+        "sokol_fontstash.h": "c",
+        "sokol_fetch.h": "c"
+    }
+}
