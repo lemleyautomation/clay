@@ -10,5 +10,6 @@
         "fontstash.h": "c",
         "sokol_fontstash.h": "c",
         "sokol_fetch.h": "c"
-    }
+    },
+    "C_Cpp.dimInactiveRegions": false
 }

@@ -10,17 +10,17 @@
 #define FONTSTASH_IMPLEMENTATION
 #define SOKOL_FONTSTASH_IMPL
 #define SOKOL_GL_IMPL
-#include "../libs/HandmadeMath.h"
-#include "../libs/sokol_gfx.h"
-#include "../libs/sokol_app.h"
-#include "../libs/sokol_log.h"
-#include "../libs/sokol_glue.h"
-#include "../libs/sokol_gl.h"
+#include "libs/HandmadeMath.h"
+#include "libs/sokol_gfx.h"
+#include "libs/sokol_app.h"
+#include "libs/sokol_log.h"
+#include "libs/sokol_glue.h"
+#include "libs/sokol_gl.h"
 #include <stdio.h>  // needed by fontstash's IO functions even though they are not used
-#include "../libs/stb_truetype.h"
-#include "../libs/fontstash.h"
-#include "../libs/sokol_fontstash.h"
-#include "../libs/sokol_fetch.h"
+#include "libs/stb_truetype.h"
+#include "libs/fontstash.h"
+#include "libs/sokol_fontstash.h"
+#include "libs/sokol_fetch.h"
 
 #define CLAY_IMPLEMENTATION
 #include "../../clay.h"
@@ -185,13 +185,16 @@ gui_vec2 rotate_vec2(float degrees, gui_vec2 vector){
 // done
 void ui_draw_text(const char* text, TextDescription text_description){
     fonsSetFont(state.fons, state.font_normal);
-    if (text_description.size == 0){text_description.size = 12.0f;}
+    if (text_description.size == 0){
+        text_description.size = 12.0f;
+    }
     fonsSetSize(state.fons, text_description.size);
     if (text_description.color == 0){text_description.color = sfons_rgba(255, 255, 255, 255);}
     fonsSetColor(state.fons, text_description.color);
     // fonsSetSize(state.fons, 12.0f);
     // fonsSetColor(state.fons,sfons_rgba(255, 255, 255, 255));
     fonsSetSpacing(state.fons, text_description.spacing);
+    fonsSetAlign(state.fons, FONS_ALIGN_BOTTOM);
     fonsDrawText(state.fons, text_description.position_x, text_description.position_y, text, NULL);
 }
 // done
@@ -650,17 +653,14 @@ void ui_render_clay(Clay_RenderCommandArray renderCommands){
         switch (renderCommand->commandType)
         {
             case CLAY_RENDER_COMMAND_TYPE_TEXT: {
-                Clay_String text = renderCommand->text;
+                Clay_StringSlice text = renderCommand->text;
                 char *cloned = (char *)malloc(text.length + 1);
                 memcpy(cloned, text.chars, text.length);
                 cloned[text.length] = '\0';
-
-                int sz = renderCommand->config.textElementConfig->fontSize;
-
                 ui_draw_text(cloned, (TextDescription){
                     .position_x = boundingBox.x,
-                    .position_y = boundingBox.y,
-                    .size = (float)renderCommand->config.textElementConfig->fontSize,
+                    .position_y = boundingBox.y+boundingBox.height,
+                    .size = (float)renderCommand->config.textElementConfig->fontSize*state.dpi_scale,
                     .spacing = (float)renderCommand->config.textElementConfig->letterSpacing,
                     .color = sfons_rgba(
                         renderCommand->config.textElementConfig->textColor.r,
@@ -836,21 +836,17 @@ void ui_render_clay(Clay_RenderCommandArray renderCommands){
 
 static inline Clay_Dimensions ui_measure_text(Clay_StringSlice text, Clay_TextElementConfig *config, uintptr_t userData)
 {
-    float out_bounds[4];
-    // char *chars = (char *)malloc(text.length + 1);
-    // memcpy(chars, text.chars, text.length);
-    // chars[text.length] = '\0';
-    
-    char *end = "\0";
+    // float out_bounds[4];
+    // char *end = "\0";
 
-    fonsSetSize(state.fons, config->fontSize);
-    fonsSetSpacing(state.fons, config->letterSpacing);
+    // fonsSetSize(state.fons, config->fontSize);
+    // fonsSetSpacing(state.fons, config->letterSpacing);
 
-	fonsTextBounds(state.fons, 10, 10, text.chars, end, out_bounds);
+	// fonsTextBounds(state.fons, 10, 10, text.chars, end, out_bounds);
 
-    //printf("%f,%f,%f,%f -- %s --\n", out_bounds[0], out_bounds[1], out_bounds[2], out_bounds[3], text.chars);
+    //printf("%f,%f,%f,%f\n", out_bounds[1], out_bounds[3], fabs(out_bounds[3]-out_bounds[1]), config->fontSize);
 
-    //free(chars);
+    //return (Clay_Dimensions) { .height = fabs(out_bounds[3]-out_bounds[1]), .width = out_bounds[0]*text.length };
 
-    return (Clay_Dimensions) { .height = config->fontSize, .width = out_bounds[0]*text.length };
+    return (Clay_Dimensions) { .height = config->fontSize, .width = (9*text.length)*state.dpi_scale };
 }
